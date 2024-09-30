@@ -23,19 +23,19 @@ jobs:
       - name: Checkout
         uses: cloudbees-io/checkout@v1
 
-      - name: Install Gradle and Set Up Wrapper
-        uses: docker://maven:3-eclipse-temurin-17
+      - name: Install Gradle and Generate Wrapper
+        uses: docker://gradle:8.4-jdk17  # Using official Gradle Docker image
         run: |
-          # Check if gradle wrapper exists
+          # Check if gradle wrapper exists and generate if missing
           if [ ! -f ./gradlew ]; then
             echo "Gradle wrapper missing, generating..."
             gradle wrapper
           fi
 
-      - name: Build Project
-        uses: docker://maven:3-eclipse-temurin-17
+      - name: Build Project with Wrapper
+        uses: docker://gradle:8.4-jdk17  # Using the same Gradle version for consistency
         run: |
-          # Make sure the wrapper is executable
+          # Ensure the wrapper is executable
           chmod +x ./gradlew
           # Run the build using the wrapper
-          ./gradlew bootRun
+          ./gradlew clean build
