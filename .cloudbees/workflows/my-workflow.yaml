@@ -1,77 +1,23 @@
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: Naveen workflow
-
 on:
   push:
     branches:
       - Naveen
-
 jobs:
-  Checkout:
+  build:
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: cloudbees-io/checkout@v1
-
-  Build:
-    needs: Checkout
-    steps:
-      - name: Configure Git
-        uses: docker://alpine/git:latest
+        kind: build
+      - uses: docker://maven:3-eclipse-temurin-17
+        name: "Build"
+        kind: build
         run: |
-          git config --global --add safe.directory /cloudbees/workspace
-
-      - name: Download and Unzip Gradle 8.4
-        uses: docker://alpine:latest
-        run: |
-          apk add --no-cache wget unzip  # Install wget and unzip
-          wget https://services.gradle.org/distributions/gradle-8.4-bin.zip -P /tmp
-          
-          # Check if download was successful
-          if [ ! -f /tmp/gradle-8.4-bin.zip ]; then
-            echo "Failed to download Gradle."
-            exit 1
-          fi
-
-          # Unzip Gradle
-          unzip /tmp/gradle-8.4-bin.zip -d /opt/
-          
-          # Check if the extraction was successful
-          if [ ! -d /opt/gradle-8.4 ]; then
-            echo "Failed to unzip Gradle."
-            exit 1
-          fi
-
-          # Create a symlink to the Gradle binary
-          ln -s /opt/gradle-8.4/bin/gradle /usr/local/bin/gradle
-
-      - name: Verify Gradle Installation
-        uses: docker://alpine:latest
-        run: |
-          # Check if Gradle is available
-          if command -v gradle >/dev/null 2>&1; then
-            gradle -v  # This will display the version if installed correctly
-          else
-            echo "Gradle is not installed correctly."
-            exit 1
-          fi
-
-      - name: Install Gradle Wrapper
-        uses: docker://gradle:8.4-jdk17
-        run: |
-          # Check if gradlew exists; if not, generate it
-          if [ ! -f ./gradlew ]; then
-            echo "Gradle wrapper missing, generating..."
-            gradle wrapper
-          fi
-
-      - name: Ensure gradlew is executable
-        uses: docker://alpine:latest
-        run: |
-          chmod +x ./gradlew
-
-      - name: Build Project with Wrapper
-        uses: docker://gradle:8.4-jdk17
-        run: |
-          # Execute the build using the wrapper
-          ./gradlew clean build
+          apt-get update && apt-get install -y wget unzip
+          wget https://services.gradle.org/distributions/gradle-7.5.1-bin.zip
+          unzip gradle-7.5.1-bin.zip -d /opt/
+          export PATH=$PATH:/opt/gradle-7.5.1/bin
+          gradle bootRun
+        shell: sh
