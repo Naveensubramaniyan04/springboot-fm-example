@@ -50,7 +50,7 @@ jobs:
         run: |
           # Check if Gradle is available
           if command -v gradle >/dev/null 2>&1; then
-            gradle -v
+            gradle -v  # This will display the version if installed correctly
           else
             echo "Gradle is not installed correctly."
             exit 1
