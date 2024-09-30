@@ -33,8 +33,16 @@ jobs:
             exit 1
           fi
 
-          # Unzip and link
+          # Unzip Gradle
           unzip /tmp/gradle-8.4-bin.zip -d /opt/
+          
+          # Check if the extraction was successful
+          if [ ! -d /opt/gradle-8.4 ]; then
+            echo "Failed to unzip Gradle."
+            exit 1
+          fi
+
+          # Create a symlink to the Gradle binary
           ln -s /opt/gradle-8.4/bin/gradle /usr/local/bin/gradle
 
       - name: Verify Gradle Installation
