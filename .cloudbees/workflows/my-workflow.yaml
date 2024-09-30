@@ -26,13 +26,27 @@ jobs:
         run: |
           apk add --no-cache wget unzip  # Install wget and unzip
           wget https://services.gradle.org/distributions/gradle-8.4-bin.zip -P /tmp
+          
+          # Check if download was successful
+          if [ ! -f /tmp/gradle-8.4-bin.zip ]; then
+            echo "Failed to download Gradle."
+            exit 1
+          fi
+
+          # Unzip and link
           unzip /tmp/gradle-8.4-bin.zip -d /opt/
           ln -s /opt/gradle-8.4/bin/gradle /usr/local/bin/gradle
 
-      - name: Check Gradle Version
+      - name: Verify Gradle Installation
         uses: docker://alpine:latest
         run: |
-          gradle -v
+          # Check if Gradle is available
+          if command -v gradle >/dev/null 2>&1; then
+            gradle -v
+          else
+            echo "Gradle is not installed correctly."
+            exit 1
+          fi
 
       - name: Install Gradle Wrapper
         uses: docker://gradle:8.4-jdk17
