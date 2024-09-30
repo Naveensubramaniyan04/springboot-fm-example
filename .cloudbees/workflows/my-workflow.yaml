@@ -21,26 +21,21 @@ jobs:
         run: |
           git config --global --add safe.directory /cloudbees/workspace
 
-      - name: Download Gradle 8.4
-        uses: docker://alpine:latest  # Using Alpine to download Gradle
+      - name: Download and Unzip Gradle 8.4
+        uses: docker://alpine:latest
         run: |
           apk add --no-cache wget unzip  # Install wget and unzip
           wget https://services.gradle.org/distributions/gradle-8.4-bin.zip -P /tmp
-
-      - name: Unzip Gradle
-        uses: docker://alpine:latest  # Using Alpine to unzip
-        run: |
-          apk add --no-cache unzip  # Ensure unzip is installed
           unzip /tmp/gradle-8.4-bin.zip -d /opt/
           ln -s /opt/gradle-8.4/bin/gradle /usr/local/bin/gradle
 
       - name: Check Gradle Version
-        uses: docker://alpine:latest  # Using Alpine to check Gradle version
+        uses: docker://alpine:latest
         run: |
           gradle -v
 
       - name: Install Gradle Wrapper
-        uses: docker://gradle:8.4-jdk17  # Using the Gradle Docker image
+        uses: docker://gradle:8.4-jdk17
         run: |
           # Check if gradlew exists; if not, generate it
           if [ ! -f ./gradlew ]; then
@@ -49,12 +44,12 @@ jobs:
           fi
 
       - name: Ensure gradlew is executable
-        uses: docker://alpine:latest  # Using Alpine to change permissions
+        uses: docker://alpine:latest
         run: |
           chmod +x ./gradlew
 
       - name: Build Project with Wrapper
-        uses: docker://gradle:8.4-jdk17  # Using the Gradle Docker image to build
+        uses: docker://gradle:8.4-jdk17
         run: |
           # Execute the build using the wrapper
           ./gradlew clean build
