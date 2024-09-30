@@ -24,7 +24,7 @@ jobs:
         uses: cloudbees-io/checkout@v1
 
       - name: Setup Gradle Wrapper
-        uses: cloudbees-io/checkout@v1
+        uses: docker://maven:3-eclipse-temurin-17
         run: |
           ./gradlew wrapper # Ensure the wrapper files are generated
 
