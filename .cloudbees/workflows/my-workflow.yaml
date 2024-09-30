@@ -8,17 +8,22 @@ on:
       - Naveen
 
 jobs:
-  build:
+  Checkout:
     steps:
-      - name: Checkout Code
+      - name: checkout
         uses: cloudbees-io/checkout@v1
-        kind: build
-      - name: Set execute permission on gradlew
+
+  Build:
+    needs: Checkout
+    steps:
+      - uses: docker://alpine/git:latest
+        run: |
+          git config --global --add safe.directory /cloudbees/workspace
+
+      - name: checkout
         uses: cloudbees-io/checkout@v1
-        run: chmod +x ./gradlew
-        shell: sh
-      - uses: docker://maven:3-eclipse-temurin-17
-        name: "Build"
-        kind: build
-        run: ./gradlew build
-        shell: sh
+
+      - name: Build 
+        uses: docker://maven:3-eclipse-temurin-17
+        run: |
+          ./gradlew bootRun
