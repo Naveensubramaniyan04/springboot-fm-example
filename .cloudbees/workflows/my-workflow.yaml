@@ -16,26 +16,45 @@ jobs:
   Build:
     needs: Checkout
     steps:
-      - uses: docker://alpine/git:latest
+      - name: Configure Git
+        uses: docker://alpine/git:latest
         run: |
           git config --global --add safe.directory /cloudbees/workspace
 
-      - name: Checkout
-        uses: cloudbees-io/checkout@v1
-
-      - name: Install Gradle and Generate Wrapper
-        uses: docker://gradle:8.4-jdk17  # Using official Gradle Docker image
+      - name: Download Gradle 8.4
+        uses: docker://alpine:latest  # Using Alpine to download Gradle
         run: |
-          # Check if gradle wrapper exists and generate if missing
+          apk add --no-cache wget unzip  # Install wget and unzip
+          wget https://services.gradle.org/distributions/gradle-8.4-bin.zip -P /tmp
+
+      - name: Unzip Gradle
+        uses: docker://alpine:latest  # Using Alpine to unzip
+        run: |
+          apk add --no-cache unzip  # Ensure unzip is installed
+          unzip /tmp/gradle-8.4-bin.zip -d /opt/
+          ln -s /opt/gradle-8.4/bin/gradle /usr/local/bin/gradle
+
+      - name: Check Gradle Version
+        uses: docker://alpine:latest  # Using Alpine to check Gradle version
+        run: |
+          gradle -v
+
+      - name: Install Gradle Wrapper
+        uses: docker://gradle:8.4-jdk17  # Using the Gradle Docker image
+        run: |
+          # Check if gradlew exists; if not, generate it
           if [ ! -f ./gradlew ]; then
             echo "Gradle wrapper missing, generating..."
             gradle wrapper
           fi
 
-      - name: Build Project with Wrapper
-        uses: docker://gradle:8.4-jdk17  # Using the same Gradle version for consistency
+      - name: Ensure gradlew is executable
+        uses: docker://alpine:latest  # Using Alpine to change permissions
         run: |
-          # Ensure the wrapper is executable
           chmod +x ./gradlew
-          # Run the build using the wrapper
-          ./gradlew wrapper
+
+      - name: Build Project with Wrapper
+        uses: docker://gradle:8.4-jdk17  # Using the Gradle Docker image to build
+        run: |
+          # Execute the build using the wrapper
+          ./gradlew clean build
