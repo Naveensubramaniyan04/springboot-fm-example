@@ -3,7 +3,8 @@ spring:
     name: springboot_fm_example
 
 rox:
-  key: 797c8be9-61b4-466c-7254-47739ca4e752
+  key: 4428b893-9511-47eb-7c05-a95f62ba4e23
+
   options:
     getConfigApiEndpoint: "https://api.cloudbees.io/device/get_configuration"
     getConfigCloudEndpoint: "https://rox-conf.cloudbees.io/"
