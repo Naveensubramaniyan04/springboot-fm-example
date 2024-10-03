@@ -12,3 +12,12 @@ rox:
     sendStateCloudEndpoint: "https://rox-state.cloudbees.io/"
     analyticsEndpoint: "https://fm-analytics-preprod.saas-preprod.beescloud.com"
     pushNotificationsEndpoint: "https://sdk-notification-service.cloudbees.io/sse"
+    retry:
+      maxAttempts: 5  # Retry logic in case of connection failure
+      backoff:
+        delay: 5000  # 5-second delay between retries
+
+logging:
+  level:
+    root: DEBUG
+    io.rollout: DEBUG  # Enabling DEBUG logs for the io.rollout package
